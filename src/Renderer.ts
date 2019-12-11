@@ -39,6 +39,8 @@ export class Renderer
         this.readBuffer_ = new THREE.WebGLMultisampleRenderTarget(this.renderer_.domElement.width, this.renderer_.domElement.height, renderTargetOptions);
         this.writeBuffer_ = new THREE.WebGLMultisampleRenderTarget(this.renderer_.domElement.width, this.renderer_.domElement.height, renderTargetOptions);
 
+        // TODO Add mirror mode control (two way, four way, diagonal, ...)
+        // TODO Add color mapping control (black and white, color maps)
         this.params_ = {
             xOffset: 0.0,
             yOffset: 0.0,
