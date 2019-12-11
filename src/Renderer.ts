@@ -1,5 +1,14 @@
 import * as THREE from 'three';
+import { GUI } from '../node_modules/three/examples/jsm/libs/dat.gui.module.js';
 
+interface GuiParams
+{
+    xOffset: number,
+    yOffset: number,
+    rotation: number,
+    scaleX: number,
+    scaleY: number
+}
 
 export class Renderer
 {
@@ -30,11 +39,20 @@ export class Renderer
         this.readBuffer_ = new THREE.WebGLMultisampleRenderTarget(this.renderer_.domElement.width, this.renderer_.domElement.height, renderTargetOptions);
         this.writeBuffer_ = new THREE.WebGLMultisampleRenderTarget(this.renderer_.domElement.width, this.renderer_.domElement.height, renderTargetOptions);
 
-        this.xOffset_ = -.5;
-        this.yOffset_ = -.0;
-        this.rotation_ = 0;
-        this.scaleX_ = 0.85;
-        this.scaleY_ = 0.85;
+        this.params_ = {
+            xOffset: 0.0,
+            yOffset: 0.0,
+            rotation: 0.0,
+            scaleX: 0.5,
+            scaleY: 0.5
+        };
+
+        let gui = new GUI();
+        gui.add(this.params_, 'xOffset').name("X Offset").step(0.001);
+        gui.add(this.params_, 'yOffset').name("Y Offset").step(0.001);
+        gui.add(this.params_, 'rotation').name("Angle").step(0.001);
+        gui.add(this.params_, 'scaleX').name("Scale X").step(0.001);
+        gui.add(this.params_, 'scaleY').name("Scale Y").step(0.001);
 
         this.run = this.run.bind(this);
     }
@@ -75,7 +93,7 @@ export class Renderer
         this.transformScreen();
         this.mirrorScreen();
         this.copyScreen();
-        this.rotation_ = time * .0001;
+        // this.rotation_ = time * .0001;
 
         requestAnimationFrame( this.run );
     }
@@ -98,7 +116,9 @@ export class Renderer
     private transformScreen()
     {
         this.fullscreenQuad_.material = new TransformShader(
-            this.readBuffer_.texture, this.xOffset_, this.yOffset_, this.rotation_, this.scaleX_, this.scaleY_
+            this.readBuffer_.texture,
+            // this.xOffset_, this.yOffset_, this.rotation_, this.scaleX_, this.scaleY_
+            this.params_.xOffset, this.params_.yOffset, this.params_.rotation, this.params_.scaleX, this.params_.scaleY
         );
         this.renderer_.setRenderTarget(this.writeBuffer_);
         this.renderer_.render(this.scene_, this.camera_);
@@ -120,11 +140,7 @@ export class Renderer
     private readBuffer_: THREE.WebGLMultisampleRenderTarget;
     private writeBuffer_: THREE.WebGLMultisampleRenderTarget;
 
-    private xOffset_: number;
-    private yOffset_: number;
-    private rotation_: number;
-    private scaleX_: number;
-    private scaleY_: number;
+    private params_: GuiParams;
 }
 
 
