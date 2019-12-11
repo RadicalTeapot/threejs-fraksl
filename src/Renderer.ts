@@ -1,12 +1,19 @@
 import * as THREE from 'three';
 
+
 export class Renderer
 {
     constructor(width: number, height: number)
     {
+        let canvas = document.createElement('canvas');
+        let context = canvas.getContext('webgl2', {antialias: true});
+
         this.renderer_ = new THREE.WebGLRenderer({
-            antialias: true
+            canvas: canvas,
+            context: context as WebGL2RenderingContext
         });
+        this.renderer_.setPixelRatio( window.devicePixelRatio );
+
         this.resize(width, height);
 
         this.scene_ = new THREE.Scene();
@@ -20,8 +27,8 @@ export class Renderer
             magFilter: THREE.LinearFilter,
             minFilter: THREE.LinearFilter,
         }
-        this.readBuffer_ = new THREE.WebGLRenderTarget(this.renderer_.domElement.width, this.renderer_.domElement.height, renderTargetOptions);
-        this.writeBuffer_ = new THREE.WebGLRenderTarget(this.renderer_.domElement.width, this.renderer_.domElement.height, renderTargetOptions);
+        this.readBuffer_ = new THREE.WebGLMultisampleRenderTarget(this.renderer_.domElement.width, this.renderer_.domElement.height, renderTargetOptions);
+        this.writeBuffer_ = new THREE.WebGLMultisampleRenderTarget(this.renderer_.domElement.width, this.renderer_.domElement.height, renderTargetOptions);
 
         this.xOffset_ = -.5;
         this.yOffset_ = -.0;
@@ -68,7 +75,7 @@ export class Renderer
         this.transformScreen();
         this.mirrorScreen();
         this.copyScreen();
-        this.rotation_ = time * .00001;
+        this.rotation_ = time * .0001;
 
         requestAnimationFrame( this.run );
     }
@@ -110,8 +117,8 @@ export class Renderer
     private scene_: THREE.Scene;
     private camera_: THREE.OrthographicCamera;
     private fullscreenQuad_: THREE.Mesh;
-    private readBuffer_: THREE.WebGLRenderTarget;
-    private writeBuffer_: THREE.WebGLRenderTarget;
+    private readBuffer_: THREE.WebGLMultisampleRenderTarget;
+    private writeBuffer_: THREE.WebGLMultisampleRenderTarget;
 
     private xOffset_: number;
     private yOffset_: number;
