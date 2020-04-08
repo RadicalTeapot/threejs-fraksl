@@ -36,8 +36,12 @@ export class Renderer
             magFilter: THREE.LinearFilter,
             minFilter: THREE.LinearFilter,
         }
-        this.readBuffer_ = new THREE.WebGLMultisampleRenderTarget(this.renderer_.domElement.width, this.renderer_.domElement.height, renderTargetOptions);
-        this.writeBuffer_ = new THREE.WebGLMultisampleRenderTarget(this.renderer_.domElement.width, this.renderer_.domElement.height, renderTargetOptions);
+        this.readBuffer_ = new THREE.WebGLMultisampleRenderTarget(
+            this.renderer_.domElement.width, this.renderer_.domElement.height, renderTargetOptions
+        );
+        this.writeBuffer_ = new THREE.WebGLMultisampleRenderTarget(
+            this.renderer_.domElement.width, this.renderer_.domElement.height, renderTargetOptions
+        );
 
         // TODO Add mirror mode control (two way, four way, diagonal, ...)
         // TODO Add color mapping control (black and white, color maps)
@@ -117,9 +121,12 @@ export class Renderer
 
     private transformScreen()
     {
+        this.fullscreenQuad_.material = new ColorShader(new THREE.Color(0xFF0000));
+        this.renderer_.setRenderTarget(this.writeBuffer_);
+        this.renderer_.render(this.scene_, this.camera_);
+
         this.fullscreenQuad_.material = new TransformShader(
             this.readBuffer_.texture,
-            // this.xOffset_, this.yOffset_, this.rotation_, this.scaleX_, this.scaleY_
             this.params_.xOffset, this.params_.yOffset, this.params_.rotation, this.params_.scaleX, this.params_.scaleY
         );
         this.renderer_.setRenderTarget(this.writeBuffer_);
@@ -208,7 +215,7 @@ class MirrorShader extends THREE.ShaderMaterial
             void main() {
                 vec2 uv = vec2(vUV.x, vUV.y);
                 if (vUV.x > 0.5) uv.x = 1.0 - vUV.x;
-                // if (vUV.y > 0.5) uv.y = 1.0 - vUV.y;
+                if (vUV.y > 0.5) uv.y = 1.0 - vUV.y;
                 gl_FragColor = texture2D(inputTexture, uv);
             }
         `;
